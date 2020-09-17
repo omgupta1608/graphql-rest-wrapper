@@ -7,6 +7,16 @@ const {
 } = require('graphql');
 
 const fetch = require('node-fetch');
+
+const ResponseType = new GraphQLObjectType({
+    name: 'Response',
+    description: '...',
+    fields: ({
+        data: { type: GraphQLString },
+        message: { type: GraphQLString }
+    })
+});
+
 const UserType = new GraphQLObjectType({
     name: 'User',
     description: '...',
@@ -45,7 +55,35 @@ const RootQueryType = new GraphQLObjectType({
     })
 });
 
+const RootMutationType = new GraphQLObjectType({
+    name: 'Mutations',
+    description: '...',
+    fields: ({
+        addUser:{
+            type: ResponseType,
+            args:{
+                name: { type: GraphQLString }
+            },
+            resolve: async (parent, args) => {
+                var data = JSON.stringify({name: args.name});
+                console.log(data);
+                var q = null;
+                await fetch(`http://localhost:4000/addUser`,{ 
+                    method: 'POST',
+                    body: data,
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(res => res.json()).then(json => {
+                    q = json;
+                });
+                console.log(q);
+                return q;
+            }
+        }
+    })
+});
+
 
 module.exports.schema = new GraphQLSchema({
-    query: RootQueryType
+    query: RootQueryType,
+    mutation: RootMutationType
 });

@@ -3,6 +3,7 @@ const morgan = require('morgan');
 var data = require('./data').data;
 
 const app = express();
+app.use(morgan('combined'));
 morgan(':remote-addr :method :url');
 app.use(express.json());
 
@@ -22,14 +23,18 @@ app.get('/:id', (req,res) => {
 });
 
 app.post('/addUser', (req,res) => {
+    console.log(req.body);
     var newUser = {
         id: data.length + 1,
         name: req.body.name
     };
-
+    console.log(newUser);
     data.push(newUser);
 
-    res.send('User Added');
+    res.send({
+        data: 'No Data',
+        message: 'User Added'
+    });
 });
 app.listen(4000, () => {
     console.log('Rest Server Started');
